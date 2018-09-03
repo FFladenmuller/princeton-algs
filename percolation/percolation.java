@@ -22,6 +22,12 @@
 //  So before a site is unioned with adjacent site, I save the adjacent
 //  site's root site status. Then after all the union's, I merge the
 //  neighbor site statuses into the newly open site root status.
+//
+//  Documentation on WeightedQuickUnionUF:
+//    https://algs4.cs.princeton.edu/code/javadoc/edu/princeton/cs/algs4/WeightedQuickUnionUF.html
+//
+//  Credit for idea of statuses:
+//    https://www.sigmainfy.com/blog/avoid-backwash-in-percolation.html
 //*******************************************************************
 
 
