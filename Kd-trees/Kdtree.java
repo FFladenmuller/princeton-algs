@@ -1,3 +1,12 @@
+//*****************************************************************************
+// Author: Frederic Fladenmuller
+// Class: Princeton Algorithms, part 1
+// Date: 10/20/18
+//
+// Uses a Kd (K-dimensional) tree to solve the problem of range search
+// and nearest neighbor search.
+//*****************************************************************************
+
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.RectHV;
@@ -83,10 +92,10 @@ public class KdTree {
     public boolean contains(Point2D p) {
         if (p == null) throw new IllegalArgumentException("Null argument to contains()");
         Node ptr = root;
-        byte orientation = 1;
+        boolean orientation = VERTICAL;
         while (ptr != null) {
             int cmp = switchCompare(ptr, p.x(), p.y());
-            orientation = (orientation == 1) ? (byte) 0 : (byte) 1;
+            orientation = (orientation == VERTICAL) ? HORIZONTAL : VERTICAL;
             if (cmp < 0) {
                 ptr = ptr.lb;
             } else {
