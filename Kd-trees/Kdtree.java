@@ -8,13 +8,16 @@ public class KdTree {
     private Point2D champion;
     private double championDistance;
 
+    private static final boolean VERTICAL = true;
+    private static final boolean HORIZONTAL = false;
+
     private static class Node {
         private Point2D p;      // the point
         private Node lb;        // the left/bottom subtree
         private Node rt;        // the right/top subtree
-        private byte orientation;
+        private boolean orientation;
 
-        public Node(Point2D p, byte orientation) {
+        public Node(Point2D p, boolean orientation) {
             this.p = p;
             lb = null;
             rt = null;
@@ -43,18 +46,18 @@ public class KdTree {
     public void insert(Point2D p) {
         if (p == null) throw new IllegalArgumentException("Null argument to insert()");
         if (!contains(p)) {
-            root = put(root, p, (byte) 1);
+            root = put(root, p, VERTICAL);
         }
     }
 
-    private Node put(Node t, Point2D p, byte orientation) {
+    private Node put(Node t, Point2D p, boolean orientation) {
         if (t == null) {
             size++;
             return new Node(p, orientation);
         }
 
         int cmp = switchCompare(t, p.x(), p.y());
-        orientation = (orientation == 1) ? (byte) 0 : (byte) 1;
+        orientation = (orientation == VERTICAL) ? HORIZONTAL : VERTICAL;
 
         if (cmp < 0) {
             t.lb = put(t.lb, p, orientation);
@@ -66,7 +69,7 @@ public class KdTree {
 
     // compare on x if orientation is vertical (1) or y if horizontal (0)
     private int switchCompare(Node t, double x, double y) {
-        if (t.orientation == 1) {
+        if (t.orientation == VERTICAL) {
             if (x > t.p.x()) return 1;
             else if (x < t.p.x()) return -1;
             return 0;
@@ -74,28 +77,6 @@ public class KdTree {
         if (y > t.p.y()) return 1;
         else if (y < t.p.y()) return -1;
         return 0;
-    }
-
-    private RectHV updateRect(byte orientation, int cmp, RectHV oldRect, Node t) {
-        double xmin = oldRect.xmin();
-        double xmax = oldRect.xmax();
-        double ymin = oldRect.ymin();
-        double ymax = oldRect.ymax();
-
-        if (orientation == 1) {
-            if (cmp > 0 || cmp == 0) {
-                xmin = t.p.x();
-            } else {
-                xmax = t.p.x();
-            }
-        } else {
-            if (cmp > 0 || cmp == 0) {
-                ymin = t.p.y();
-            } else {
-                ymax = t.p.y();
-            }
-        }
-        return new RectHV(xmin, ymin, xmax, ymax);
     }
 
     // does the set contain point p?
@@ -106,13 +87,13 @@ public class KdTree {
         while (ptr != null) {
             int cmp = switchCompare(ptr, p.x(), p.y());
             orientation = (orientation == 1) ? (byte) 0 : (byte) 1;
-            if (cmp > 0 || cmp == 0) {
+            if (cmp < 0) {
+                ptr = ptr.lb;
+            } else {
                 if (ptr.p.equals(p)) {
                     return true;
                 }
                 ptr = ptr.rt;
-            } else if (cmp < 0) {
-                ptr = ptr.lb;
             }
         }
         return false;
@@ -167,6 +148,28 @@ public class KdTree {
         championDistance = Double.MAX_VALUE;
         findNearest(p, root, new RectHV(0.0, 0.0, 1.0, 1.0));
         return champion;
+    }
+
+    private RectHV updateRect(boolean orientation, int cmp, RectHV oldRect, Node t) {
+        double xmin = oldRect.xmin();
+        double xmax = oldRect.xmax();
+        double ymin = oldRect.ymin();
+        double ymax = oldRect.ymax();
+
+        if (orientation == VERTICAL) {
+            if (cmp > 0 || cmp == 0) {
+                xmin = t.p.x();
+            } else {
+                xmax = t.p.x();
+            }
+        } else {
+            if (cmp > 0 || cmp == 0) {
+                ymin = t.p.y();
+            } else {
+                ymax = t.p.y();
+            }
+        }
+        return new RectHV(xmin, ymin, xmax, ymax);
     }
 
     /*Nearest-neighbor search. To find a closest point to a given query
