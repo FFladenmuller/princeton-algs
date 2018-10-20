@@ -131,7 +131,7 @@ public class KdTree {
            rect will be greater than point, so it is either
            above or to the right of root. In this case search
            right subtree. If both are less, it is below or to the left,
-           so search left subtree. Otherwise, it must root's line,
+           so search left subtree. Otherwise, it must  intersect root's line,
            so we must search both subtrees.
          */
         int cmpMin = switchCompare(t, rect.xmin(), rect.ymin());
